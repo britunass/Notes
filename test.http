@@ -9,23 +9,23 @@ POST http://localhost:3000/notes
 Content-Type: application/json
 
 {
-  "title": "Планы на спринт",
-  "content": "## Задачи\n1. Написать **API**\n2. Сделать *тесты*",
-  "tags": ["work", "sprint", "markdown"]
+  "title": "Планы на релиз",
+  "content": "## Задачи\n1. Собрать сборку УК **3.0.12.240**\n2. Сделать *тесты установки*",
+  "tags": ["работа", "срочно", "сборка"]
 }
 
 ### Обновление
-PUT http://localhost:3000/notes/1
+PUT http://localhost:3000/notes/3
 Content-Type: application/json
 
 {
-  "title": "Изучение Express.js и Node.js",
-  "content": "# Обновленный заголовок\n\nИзучение полностью завершено!",
-  "tags": ["node", "express", "backend", "done"]
+  "title": "Релиз",
+  "content": "# Обновленный заголовок\n\nОтправка на FTP",
+  "tags": ["работа", "срочно", "сборка", "сделано"]
 }
 
 ### Удаление
-DELETE http://localhost:3000/notes/2
+DELETE http://localhost:3000/notes/3
 
 ### Ошибка 404
 GET http://localhost:3000/notes/999
