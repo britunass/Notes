@@ -1,0 +1,31 @@
+### Получение всех
+GET http://localhost:3000/notes
+
+### Получение по id
+GET http://localhost:3000/notes/1
+
+### Создание
+POST http://localhost:3000/notes
+Content-Type: application/json
+
+{
+  "title": "Планы на спринт",
+  "content": "## Задачи\n1. Написать **API**\n2. Сделать *тесты*",
+  "tags": ["work", "sprint", "markdown"]
+}
+
+### Обновление
+PUT http://localhost:3000/notes/1
+Content-Type: application/json
+
+{
+  "title": "Изучение Express.js и Node.js",
+  "content": "# Обновленный заголовок\n\nИзучение полностью завершено!",
+  "tags": ["node", "express", "backend", "done"]
+}
+
+### Удаление
+DELETE http://localhost:3000/notes/2
+
+### Ошибка 404
+GET http://localhost:3000/notes/999
