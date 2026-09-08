@@ -15,7 +15,7 @@ Content-Type: application/json
 }
 
 ### Обновление
-PUT http://localhost:3000/notes/3
+PUT http://localhost:3000/notes/7
 Content-Type: application/json
 
 {
@@ -26,7 +26,4 @@ Content-Type: application/json
 }
 
 ### Удаление
-DELETE http://localhost:3000/notes/4
-
-### Ошибка 404
-GET http://localhost:3000/notes/3
+DELETE http://localhost:3000/notes/7
