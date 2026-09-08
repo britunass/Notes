@@ -5,98 +5,95 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 
-let notes = [
-  {
-    id: 1,
-    title: 'Дама с камелиями',
-    content: '# Заголовок\n\nПрочитать биографию **Александра Дюма-сына** и *Мари Дюплесси*.',
-    tags: ['литература', 'читать', 'развитие'],
-    createdAt: new Date().toISOString()
-  },
-  {
-    id: 2,
-    title: 'Купить:',
-    content: '- Яблоки\n- Бананы\n- Виноград',
-    tags: ['важное', 'покупки', 'продукты'],
-    createdAt: new Date().toISOString()
+const { Note } = require('./models');
+
+app.get('/notes', async (req, res) => {
+  try {
+
+    const notes = await Note.findAll();
+    res.json(notes);
+
+  } catch (error) {
+    next(error);
   }
-];
-
-let nextId = 3;
-
-app.get('/notes', (req, res) => {
-  res.json(notes);
 });
 
-app.get('/test-500', (req, res) => {
-  throw new Error('Критический сбой');
+app.get('/notes/:id', async (req, res) => {
+  try{
+
+    const note = await Note.findByPk(req.params.id);
+
+    if (!note) {
+      return res.status(404).json({ error: 'Заметка с указанным ID не найдена' });
+    }
+
+    res.json(note);
+
+  } catch {
+    next(error);
+  }
 });
 
-app.get('/notes/:id', (req, res) => {
-  const id = parseInt(req.params.id, 10);
-  const note = notes.find(n => n.id === id);
+app.post('/notes', async (req, res) => {
+  try{
 
-  if (!note) {
-    return res.status(404).json({ error: 'Заметка с указанным ID не найдена' });
+    const { title, content, isArchived, tags } = req.body;
+
+    if (!title || !content) {
+      return res.status(400).json({ error: 'Поля "title" и "content" обязательны для заполнения' });
+    }
+
+    const newNote = await Note.create({ title, content, isArchived, tags });
+
+    res.status(201).json(newNote);
+
+  } catch {
+    next(error);
   }
-
-  res.json(note);
 });
 
-app.post('/notes', (req, res) => {
-  const { title, content, tags } = req.body;
+app.put('/notes/:id', async (req, res) => {
+  try{
 
-  if (!title || !content) {
-    return res.status(400).json({ error: 'Поля "title" и "content" обязательны для заполнения' });
+    const { title, content, isArchived, tags } = req.body;
+
+    if (!title || !content) {
+      return res.status(400).json({ error: 'Поля "title" и "content" обязательны для обновления' });
+    }
+
+    const [updatedRows] = await Note.update(
+      { title, content, isArchived, tags },
+      { where: { id: req.params.id } }
+    );
+
+    if (updatedRows === 0) {
+      return res.status(404).json({ error: 'Заметка не найдена' });
+    }
+
+    const updatedNote = await Note.findByPk(req.params.id);
+
+    res.json(updatedNote);
+
+  } catch{
+    next(error);
   }
-
-  const newNote = {
-    id: nextId++,
-    title,
-    content,
-    tags: Array.isArray(tags) ? tags : [],
-    createdAt: new Date().toISOString()
-  };
-
-  notes.push(newNote);
-  res.status(201).json(newNote);
 });
 
-app.put('/notes/:id', (req, res) => {
-  const id = parseInt(req.params.id, 10);
-  const noteIndex = notes.findIndex(n => n.id === id);
+app.delete('/notes/:id', async (req, res) => {
+  try{
+    const deletedRows = await Note.destroy({
+        where: { id: req.params.id }
+    });
 
-  if (noteIndex === -1) {
-    return res.status(404).json({ error: 'Заметка с указанным ID не найдена' });
+    if (deletedRows === 0) {
+        return res.status(404).json({ error: 'Заметка не найдена' });
+      }
+
+    res.json({ message: 'Заметка успешно удалена'});
+    
+  } catch{
+    next(error);
   }
-
-  const { title, content, tags } = req.body;
-
-  if (!title || !content) {
-    return res.status(400).json({ error: 'Поля "title" и "content" обязательны для обновления' });
-  }
-
-  notes[noteIndex] = {
-    ...notes[noteIndex],
-    title,
-    content,
-    tags: Array.isArray(tags) ? tags : [],
-    updatedAt: new Date().toISOString()
-  };
-
-  res.json(notes[noteIndex]);
-});
-
-app.delete('/notes/:id', (req, res) => {
-  const id = parseInt(req.params.id, 10);
-  const noteIndex = notes.findIndex(n => n.id === id);
-
-  if (noteIndex === -1) {
-    return res.status(404).json({ error: 'Заметка с указанным ID не найдена' });
-  }
-
-  const deletedNote = notes.splice(noteIndex, 1)[0];
-  res.json({ message: 'Заметка успешно удалена', deletedNote });
 });
 
 app.use((req, res) => {

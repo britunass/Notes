@@ -2,7 +2,7 @@
 GET http://localhost:3000/notes
 
 ### Получение по id
-GET http://localhost:3000/notes/1
+GET http://localhost:3000/notes/2
 
 ### Создание
 POST http://localhost:3000/notes
@@ -19,16 +19,14 @@ PUT http://localhost:3000/notes/3
 Content-Type: application/json
 
 {
-  "title": "Релиз",
-  "content": "# Обновленный заголовок\n\nОтправка на FTP",
-  "tags": ["работа", "срочно", "сборка", "сделано"]
+  "title": "Тест",
+  "content": "# Обновленный заголовок\n\nТестик",
+  "tags": ["работа", "срочно", "сделано"],
+  "isArchived": false
 }
 
 ### Удаление
-DELETE http://localhost:3000/notes/3
+DELETE http://localhost:3000/notes/4
 
 ### Ошибка 404
 GET http://localhost:3000/notes/3
-
-### Ошибка 500
-GET http://localhost:3000/test-500
