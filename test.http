@@ -28,4 +28,7 @@ Content-Type: application/json
 DELETE http://localhost:3000/notes/3
 
 ### Ошибка 404
-GET http://localhost:3000/notes/999
+GET http://localhost:3000/notes/3
+
+### Ошибка 500
+GET http://localhost:3000/test-500

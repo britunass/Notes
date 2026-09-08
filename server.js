@@ -28,6 +28,10 @@ app.get('/notes', (req, res) => {
   res.json(notes);
 });
 
+app.get('/test-500', (req, res) => {
+  throw new Error('Критический сбой');
+});
+
 app.get('/notes/:id', (req, res) => {
   const id = parseInt(req.params.id, 10);
   const note = notes.find(n => n.id === id);
@@ -105,5 +109,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Сервер запущен на порту ${PORT}`);
+  console.log(`Сервер запущен...`);
 });
