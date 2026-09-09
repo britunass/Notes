@@ -1,12 +1,40 @@
+### Регистрация пользователя
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+  "email": "student2@example.com",
+  "password": "Password12345!"
+}
+
+### Вход в систему
+# @name login
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "email": "student2@example.com",
+  "password": "Password12345!",
+  "rememberMe": false
+}
+
+### Запрос к профилю
+GET http://localhost:3000/auth/profile
+Authorization: Bearer {{login.response.body.token}}
+//Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiZW1haWwiOiJzdHVkZW50MkBleGFtcGxlLmNvbSIsImlhdCI6MTc4ODk4MzM2NywiZXhwIjoxNzkwNzk3NzY3fQ.FtJbjlszsmC-n02ivqaBLYqlVJmmUzzgSX6DDQpq6aw
+
 ### Получение всех
 GET http://localhost:3000/notes
+Authorization: Bearer {{login.response.body.token}}
 
 ### Получение по id
 GET http://localhost:3000/notes/2
+Authorization: Bearer {{login.response.body.token}}
 
 ### Создание
 POST http://localhost:3000/notes
 Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
 
 {
   "title": "Планы на релиз",
@@ -17,6 +45,7 @@ Content-Type: application/json
 ### Обновление
 PUT http://localhost:3000/notes/7
 Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
 
 {
   "title": "Тест",
@@ -27,3 +56,4 @@ Content-Type: application/json
 
 ### Удаление
 DELETE http://localhost:3000/notes/7
+Authorization: Bearer {{login.response.body.token}}
