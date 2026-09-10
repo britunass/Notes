@@ -1,4 +1,5 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 
 export function NoteEditor({
   title,
@@ -10,6 +11,7 @@ export function NoteEditor({
   isArchived
 }) {
   const textareaRef = useRef(null);
+  const [isFocused, setIsFocused] = useState(false);
 
   const adjustTextareaHeight = () => {
     if (textareaRef.current) {
@@ -20,7 +22,7 @@ export function NoteEditor({
 
   useEffect(() => {
     adjustTextareaHeight();
-  }, [content]);
+  }, [content, isFocused]);
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -32,7 +34,7 @@ export function NoteEditor({
           boxShadow: '4px 4px 12px rgba(0,0,0,0.2)',
           minWidth: '280px',
           maxWidth: '320px',
-          minHeight: '280px',
+          width: '300px',
           height: 'auto',
           display: 'flex',
           flexDirection: 'column',
@@ -61,25 +63,52 @@ export function NoteEditor({
             }}
           />
 
-          <textarea
-            ref={textareaRef}
-            value={content}
-            disabled={isArchived}
-            onChange={e => setContent(e.target.value)}
-            placeholder={isArchived ? 'Заметка в архиве' : 'Текст заметки...'}
-            rows={8}
-            style={{
-              width: '100%',
-              border: 'none',
-              background: 'transparent',
-              fontSize: '13px',
-              outline: 'none',
-              resize: 'none',
-              overflow: 'hidden',
-              fontFamily: 'inherit',
-              color: '#333'
-            }}
-          />
+          {isFocused && !isArchived ? (
+            <textarea
+              ref={textareaRef}
+              value={content}
+              autoFocus
+              disabled={isArchived}
+              onChange={e => setContent(e.target.value)}
+              onBlur={() => setIsFocused(false)}
+              placeholder={isArchived ? 'Заметка в архиве' : 'Текст заметки...'}
+              rows={8}
+              style={{
+                width: '100%',
+                border: 'none',
+                background: 'transparent',
+                fontSize: '13px',
+                outline: 'none',
+                resize: 'none',
+                overflow: 'hidden',
+                fontFamily: 'inherit',
+                color: '#333'
+              }}
+            />
+          ) : (
+            <div
+              onClick={() => !isArchived && setIsFocused(true)}
+              className="markdown-content"
+              style={{
+                width: '100%',
+                fontSize: '13px',
+                color: '#333',
+                lineHeight: '1.4',
+                cursor: isArchived ? 'default' : 'pointer',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+                minHeight: '130px'
+              }}
+            >
+              {content ? (
+                <ReactMarkdown>{content}</ReactMarkdown>
+              ) : (
+                <span style={{ color: '#888', fontStyle: 'italic' }}>
+                  {isArchived ? 'Заметка в архиве' : 'Текст заметки...'}
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         <input

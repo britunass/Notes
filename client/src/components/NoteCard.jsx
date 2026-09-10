@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
 
 export function NoteCard({ note, isSelected, onSelect }) {
   const hasTags = note.tags && note.tags.length > 0;
@@ -14,23 +15,46 @@ export function NoteCard({ note, isSelected, onSelect }) {
         cursor: 'pointer',
         opacity: note.isArchived ? 0.5 : 1,
         transition: 'all 0.15s ease',
-        minHeight: '110px',
+        height: '110px',             
+        width: '100%',              
+        maxWidth: '350px',           
         boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        overflow: 'hidden'          
       }}
     >
       <div>
         <div style={{ fontWeight: 'bold', textAlign: 'center', fontSize: '13px', marginBottom: '6px', color: '#222' }}>
           {note.title}
         </div>
-        <div style={{ fontSize: '12px', color: '#444', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          {note.content}
+
+        <div
+          style={{
+            fontSize: '12px',
+            color: '#444',
+            maxHeight: '40px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',    
+            wordBreak: 'break-all'   
+          }}
+        >
+          <ReactMarkdown
+            components={{
+              p: ({ node, ...props }) => <span {...props} />,
+              h1: ({ node, ...props }) => <span style={{ fontWeight: 'bold' }} {...props} />,
+              h2: ({ node, ...props }) => <span style={{ fontWeight: 'bold' }} {...props} />,
+              h3: ({ node, ...props }) => <span style={{ fontWeight: 'bold' }} {...props} />
+            }}
+          >
+            {note.content}
+          </ReactMarkdown>
         </div>
       </div>
 
-      <div style={{ fontSize: '10px', color: '#666', marginTop: '6px', minHeight: '15px' }}>
+      <div style={{ fontSize: '10px', color: '#666', marginTop: '6px', minHeight: '15px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {hasTags ? note.tags.map(t => `#${t}`).join(' ') : ''}
       </div>
     </div>
