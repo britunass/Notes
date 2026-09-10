@@ -13,16 +13,34 @@ export function NoteEditor({
   const textareaRef = useRef(null);
   const [isFocused, setIsFocused] = useState(false);
 
-  const adjustTextareaHeight = () => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+  useEffect(() => {
+    if (isFocused && textareaRef.current) {
+      const el = textareaRef.current;
+      el.style.height = 'auto';
+      el.style.height = `${Math.max(150, el.scrollHeight)}px`;
     }
-  };
+  }, [content, isFocused]);
 
   useEffect(() => {
-    adjustTextareaHeight();
-  }, [content, isFocused]);
+    if (isFocused && textareaRef.current) {
+      const el = textareaRef.current;
+      const length = el.value.length;
+      el.setSelectionRange(length, length);
+    }
+  }, [isFocused]);
+
+  const sharedTypographyStyle = {
+    width: '100%',
+    fontSize: '13px',
+    lineHeight: '1.5',
+    fontFamily: 'inherit',
+    color: '#333',
+    textAlign: 'left',
+    padding: 0,
+    margin: 0,
+    boxSizing: 'border-box',
+    minHeight: '150px'
+  };
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -38,7 +56,7 @@ export function NoteEditor({
           height: 'auto',
           display: 'flex',
           flexDirection: 'column',
-          justify: 'space-between',
+          justifyContent: 'space-between',
           boxSizing: 'border-box',
           opacity: isArchived ? 0.65 : 1
         }}
@@ -68,43 +86,35 @@ export function NoteEditor({
               ref={textareaRef}
               value={content}
               autoFocus
-              disabled={isArchived}
               onChange={e => setContent(e.target.value)}
               onBlur={() => setIsFocused(false)}
-              placeholder={isArchived ? 'Заметка в архиве' : 'Текст заметки...'}
-              rows={8}
+              placeholder="Текст заметки..."
               style={{
-                width: '100%',
+                ...sharedTypographyStyle,
                 border: 'none',
                 background: 'transparent',
-                fontSize: '13px',
                 outline: 'none',
                 resize: 'none',
-                overflow: 'hidden',
-                fontFamily: 'inherit',
-                color: '#333'
+                overflow: 'hidden'
               }}
             />
           ) : (
             <div
               onClick={() => !isArchived && setIsFocused(true)}
-              className="markdown-content"
               style={{
-                width: '100%',
-                fontSize: '13px',
-                color: '#333',
-                lineHeight: '1.4',
+                ...sharedTypographyStyle,
                 cursor: isArchived ? 'default' : 'pointer',
                 whiteSpace: 'pre-wrap',
-                wordBreak: 'break-word',
-                minHeight: '130px'
+                wordBreak: 'break-word'
               }}
             >
               {content ? (
-                <ReactMarkdown>{content}</ReactMarkdown>
+                <ReactMarkdown>
+                  {content}
+                </ReactMarkdown>
               ) : (
-                <span style={{ color: '#888', fontStyle: 'italic' }}>
-                  {isArchived ? 'Заметка в архиве' : 'Текст заметки...'}
+                <span style={{ color: '#888', fontStyle: 'normal' }}>
+                  Текст заметки...
                 </span>
               )}
             </div>
@@ -125,6 +135,7 @@ export function NoteEditor({
             fontSize: '11px',
             outline: 'none',
             paddingTop: '8px',
+            marginTop: '15px',
             color: '#555'
           }}
         />

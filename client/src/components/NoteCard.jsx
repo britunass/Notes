@@ -15,9 +15,11 @@ export function NoteCard({ note, isSelected, onSelect }) {
         cursor: 'pointer',
         opacity: note.isArchived ? 0.5 : 1,
         transition: 'all 0.15s ease',
-        height: '110px',             
-        width: '100%',              
-        maxWidth: '350px',           
+        height: '110px',            
+        width: '350px',
+        minWidth: 0,
+        maxWidth: '100%',
+        flexShrink: 0,              
         boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'column',
@@ -25,8 +27,19 @@ export function NoteCard({ note, isSelected, onSelect }) {
         overflow: 'hidden'          
       }}
     >
-      <div>
-        <div style={{ fontWeight: 'bold', textAlign: 'center', fontSize: '13px', marginBottom: '6px', color: '#222' }}>
+      <div style={{ overflow: 'hidden' }}>
+        <div 
+          style={{ 
+            fontWeight: 'bold', 
+            textAlign: 'center', 
+            fontSize: '13px', 
+            marginBottom: '6px', 
+            color: '#222',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}
+        >
           {note.title}
         </div>
 
@@ -34,7 +47,7 @@ export function NoteCard({ note, isSelected, onSelect }) {
           style={{
             fontSize: '12px',
             color: '#444',
-            maxHeight: '40px',
+            height: '18px',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',    
@@ -46,7 +59,10 @@ export function NoteCard({ note, isSelected, onSelect }) {
               p: ({ node, ...props }) => <span {...props} />,
               h1: ({ node, ...props }) => <span style={{ fontWeight: 'bold' }} {...props} />,
               h2: ({ node, ...props }) => <span style={{ fontWeight: 'bold' }} {...props} />,
-              h3: ({ node, ...props }) => <span style={{ fontWeight: 'bold' }} {...props} />
+              h3: ({ node, ...props }) => <span style={{ fontWeight: 'bold' }} {...props} />,
+              ul: ({ node, ...props }) => <span {...props} />,
+              ol: ({ node, ...props }) => <span {...props} />,
+              li: ({ node, ...props }) => <span style={{ marginRight: '6px' }} {...props} />
             }}
           >
             {note.content}
