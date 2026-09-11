@@ -11,13 +11,15 @@ export function useNoteFilter(notes) {
     return ['все', ...Array.from(tagsSet)];
   }, [notes]);
 
+  const activeTag = availableTags.includes(selectedTag) ? selectedTag : 'все';
+
   const filteredNotes = useMemo(() => {
     return notes.filter(note => {
       const matchesSearch =
         note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         note.content.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchesTag = selectedTag === 'все' || note.tags?.includes(selectedTag);
+      const matchesTag = activeTag === 'все' || note.tags?.includes(activeTag);
       const matchesArchive = showOnlyArchived ? note.isArchived : !note.isArchived;
 
       return matchesSearch && matchesTag && matchesArchive;
@@ -26,7 +28,8 @@ export function useNoteFilter(notes) {
 
   return {
     searchQuery, setSearchQuery,
-    selectedTag, setSelectedTag,
+    selectedTag: activeTag,
+    setSelectedTag,
     showOnlyArchived, setShowOnlyArchived,
     availableTags,
     filteredNotes

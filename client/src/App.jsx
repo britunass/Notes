@@ -91,8 +91,10 @@ function MainNotesApp({ onLogout }) {
   }
 
   return (
-    <div>
+    <div style={{ display: 'inline-block', minWidth: '100%' }}>
       <div style={{
+        width: '100%',                  
+        boxSizing: 'border-box',
         display: 'flex',
         justifyContent: 'flex-end',
         padding: '10px 20px',
@@ -102,13 +104,22 @@ function MainNotesApp({ onLogout }) {
         <button
           onClick={onLogout}
           style={{
-            padding: '6px 12px',
-            backgroundColor: '#dc3545',
-            color: '#fff',
-            border: 'none',
+            padding: '6px 36px',
+            backgroundColor: 'transparent', 
+            color: '#dc3545', 
+            border: '1px solid #dc3545', 
             borderRadius: '4px',
             cursor: 'pointer',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            transition: 'all 0.2s ease',
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.backgroundColor = '#dc3545';
+            e.target.style.color = '#fff';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.backgroundColor = 'transparent';
+            e.target.style.color = '#dc3545';
           }}
         >
           Выйти

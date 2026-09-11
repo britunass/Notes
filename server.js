@@ -12,7 +12,6 @@ app.use(express.json());
 app.use('/auth', authRoutes);
 
 app.use('/notes', authMiddleware, noteRoutes);
-//app.use('/notes', noteRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Маршрут не найден' });

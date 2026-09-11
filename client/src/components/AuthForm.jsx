@@ -5,7 +5,7 @@ export function AuthForm({ onLoginSuccess }) {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false); // <--- Добавили state
+  const [rememberMe, setRememberMe] = useState(false); 
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -15,7 +15,6 @@ export function AuthForm({ onLoginSuccess }) {
     setLoading(true);
 
     try {
-      // Отправляем rememberMe при входе
       const payload = isLogin ? { email, password, rememberMe } : { email, password };
       const authFn = isLogin ? loginUser : registerUser;
       const response = await authFn(payload);
@@ -42,7 +41,7 @@ export function AuthForm({ onLoginSuccess }) {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h2 style={{ marginBottom: '15px' }}>{isLogin ? 'Вход' : 'Регистрация'}</h2>
+        <h2 style={{ marginBottom: '15px', color: '#fff' }}>{isLogin ? 'Вход' : 'Регистрация'}</h2>
         {error && <div style={styles.error}>{error}</div>}
 
         <form onSubmit={handleSubmit} style={styles.form}>
@@ -63,7 +62,6 @@ export function AuthForm({ onLoginSuccess }) {
             style={styles.input}
           />
 
-          {/* Чекбокс Запомнить меня */}
           {isLogin && (
             <label style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ccc', fontSize: '14px', cursor: 'pointer' }}>
               <input

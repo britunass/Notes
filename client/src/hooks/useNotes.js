@@ -9,7 +9,6 @@ export function useNotes() {
   const [selectedNoteId, setSelectedNoteId] = useState(null);
   const [isCreatingNew, setIsCreatingNew] = useState(false);
 
-  // Функция перезагрузки
   const loadNotes = useCallback(async (signal) => {
     try {
       setLoading(true);
@@ -26,7 +25,6 @@ export function useNotes() {
     }
   }, []);
 
-  // Вызов при монтировании с AbortController
   useEffect(() => {
     const controller = new AbortController();
     loadNotes(controller.signal);
@@ -121,7 +119,6 @@ export function useNotes() {
     );
 
     try {
-      // Передаем весь объект targetNote с обновленным isArchived
       await updateNote(selectedNoteId, {
         ...targetNote,
         isArchived: updatedArchiveState
