@@ -1,8 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNotes } from './hooks/useNotes';
 import { NoteList } from './components/NoteList';
+import { AuthForm } from './components/AuthForm';
 
 function App() {
+  const [token, setToken] = useState(localStorage.getItem('token'));
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setToken(localStorage.getItem('token'));
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
+
+  const handleLoginSuccess = () => {
+    setToken(localStorage.getItem('token'));
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setToken(null);
+  };
+
+  if (!token) {
+    return <AuthForm onLoginSuccess={handleLoginSuccess} />;
+  }
+
+  return <MainNotesApp onLogout={handleLogout} />;
+}
+
+function MainNotesApp({ onLogout }) {
   const {
     notes,
     loading,
@@ -64,6 +92,29 @@ function App() {
 
   return (
     <div>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'flex-end',
+        padding: '10px 20px',
+        backgroundColor: '#1e1e1e',
+        borderBottom: '1px solid #333'
+      }}>
+        <button
+          onClick={onLogout}
+          style={{
+            padding: '6px 12px',
+            backgroundColor: '#dc3545',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontWeight: 'bold'
+          }}
+        >
+          Выйти
+        </button>
+      </div>
+
       <NoteList 
         notes={notes}
         selectedNote={selectedNote}
