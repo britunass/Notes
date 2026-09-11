@@ -1,15 +1,18 @@
 const express = require('express');
+const cors = require('cors');
 const noteRoutes = require('./routes/noteRoutes');
 const authRoutes = require('./routes/authRoutes');
 const authMiddleware = require('./middleware/auth');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(cors());
 app.use(express.json());
 
 app.use('/auth', authRoutes);
 
-app.use('/notes', authMiddleware, noteRoutes);
+//app.use('/notes', authMiddleware, noteRoutes);
+app.use('/notes', noteRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Маршрут не найден' });
