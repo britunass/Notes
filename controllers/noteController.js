@@ -3,7 +3,11 @@ const { Note } = require('../models');
 exports.getAllNotes = async (req, res, next) => {
   try {
 
-    const notes = await Note.findAll();
+    const notes = await Note.findAll(
+      {
+      where: { userId: req.user.id }
+      }
+    );
     res.json(notes);
 
   } catch (error) {
@@ -14,7 +18,12 @@ exports.getAllNotes = async (req, res, next) => {
 exports.getNoteById = async (req, res, next) => {
     try{
 
-        const note = await Note.findByPk(req.params.id);
+        const note = await Note.findOne({
+          where: {
+            id: req.params.id,
+            userId: req.user.id
+          }
+        });
 
         if (!note) {
         return res.status(404).json({ error: 'Заметка с указанным ID не найдена' });
@@ -36,7 +45,7 @@ exports.createNote = async (req, res, next) => {
       return res.status(400).json({ error: 'Поля "title" и "content" обязательны для заполнения' });
     }
 
-    const newNote = await Note.create({ title, content, isArchived, tags });
+    const newNote = await Note.create({ title, content, isArchived, tags, userId: req.user.id });
 
     res.status(201).json(newNote);
 
@@ -56,14 +65,19 @@ exports.updateNote = async (req, res, next) => {
 
     const [updatedRows] = await Note.update(
       { title, content, isArchived, tags },
-      { where: { id: req.params.id } }
+      { where: { id: req.params.id, userId: req.user.id } }
     );
 
     if (updatedRows === 0) {
       return res.status(404).json({ error: 'Заметка не найдена' });
     }
 
-    const updatedNote = await Note.findByPk(req.params.id);
+    const updatedNote = await Note.findByPk({
+      where: {
+        id: req.params.id,
+        userId: req.user.id
+      }
+    });
 
     res.json(updatedNote);
 
@@ -76,7 +90,7 @@ exports.deleteNote = async (req, res, next) => {
     try{ 
   
     const deletedRows = await Note.destroy({
-        where: { id: req.params.id }
+        where: { id: req.params.id, userId: req.user.id }
     });
 
     if (deletedRows === 0) {
