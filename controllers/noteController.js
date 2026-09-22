@@ -72,7 +72,7 @@ exports.updateNote = async (req, res, next) => {
       return res.status(404).json({ error: 'Заметка не найдена' });
     }
 
-    const updatedNote = await Note.findByPk({
+    const updatedNote = await Note.findOne({
       where: {
         id: req.params.id,
         userId: req.user.id
