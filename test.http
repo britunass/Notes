@@ -13,9 +13,9 @@ POST http://localhost:3000/auth/login
 Content-Type: application/json
 
 {
-  "email": "student2@example.com",
+  "email": "student5@example.com",
   "password": "Password12345!",
-  "rememberMe": false
+  "rememberMe": true
 }
 
 ### Запрос к профилю
