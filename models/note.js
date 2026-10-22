@@ -1,32 +1,19 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class Note extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models) {
-      // define association here
-    }
-  }
-  Note.init({
-    title: DataTypes.STRING,
-    content: DataTypes.STRING,
-    isArchived: { 
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
-    },
-    tags: {
-      type: DataTypes.ARRAY(DataTypes.STRING),
-      defaultValue: []
-    }
-  }, {
-    sequelize,
-    modelName: 'Note',
-  });
-  return Note;
-};
+const mongoose = require('mongoose');
+
+const checklistItemSchema = new mongoose.Schema({
+  text: { type: String, required: true },
+  done: { type: Boolean, default: false }
+});
+
+const noteSchema = new mongoose.Schema({
+  title: { type: String, required: true, trim: true },
+  content: { type: String, required: true },
+  isArchived: { type: Boolean, default: false },
+  tags: { type: [String], default: [] },
+  checklist: [checklistItemSchema],
+  createdAt: { type: Date, default: Date.now }
+});
+
+noteSchema.index({ tags: 1 });
+
+module.exports = mongoose.model('Note', noteSchema);

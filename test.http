@@ -1,29 +1,72 @@
-### Получение всех
-GET http://localhost:3000/notes
+@baseUrl = http://localhost:3000
 
-### Получение по id
-GET http://localhost:3000/notes/2
-
-### Создание
-POST http://localhost:3000/notes
+### 1. Создание 
+# @name createNote
+POST {{baseUrl}}/notes
 Content-Type: application/json
 
 {
   "title": "Планы на релиз",
   "content": "## Задачи\n1. Собрать сборку УК **3.0.12.240**\n2. Сделать *тесты установки*",
-  "tags": ["работа", "срочно", "сборка"]
+  "tags": ["работа", "срочно", "сборка"],
+  "checklist": [
+    { "text": "Собрать сборку" },
+    { "text": "Сделать тесты установки" }
+  ]
 }
 
-### Обновление
-PUT http://localhost:3000/notes/7
+@noteId = {{createNote.response.body._id}}
+
+### 2. Получение всех
+GET {{baseUrl}}/notes
+
+### 3. Получение по id
+GET {{baseUrl}}/notes/{{noteId}}
+
+### 4. Обновление
+PUT {{baseUrl}}/notes/{{noteId}}
 Content-Type: application/json
 
 {
-  "title": "Тест",
+  "title": "Планы на релиз (обновлено)",
   "content": "# Обновленный заголовок\n\nТестик",
   "tags": ["работа", "срочно", "сделано"],
   "isArchived": false
 }
 
-### Удаление
-DELETE http://localhost:3000/notes/7
+### 5. Добавить пункт в чек-лист
+# @name addItem
+POST {{baseUrl}}/notes/{{noteId}}/checklist
+Content-Type: application/json
+
+{
+  "text": "Отправить сборку заказчику"
+}
+
+### Id последнего пункта чек-листа
+@itemId = {{addItem.response.body.checklist[2]._id}}
+
+### 6. Отметить пункт выполненным (обновление внутри массива, $ оператор)
+PATCH {{baseUrl}}/notes/{{noteId}}/checklist/{{itemId}}
+Content-Type: application/json
+
+{
+  "done": true
+}
+
+### 7. Удалить пункт из чек-листа
+DELETE {{baseUrl}}/notes/{{noteId}}/checklist/{{itemId}}
+
+### 8. Ошибка: некорректный id
+GET {{baseUrl}}/notes/2
+
+### 9. Ошибка валидации 
+POST {{baseUrl}}/notes
+Content-Type: application/json
+
+{
+  "content": "Без заголовка"
+}
+
+### 10. Удаление заметки
+DELETE {{baseUrl}}/notes/{{noteId}}

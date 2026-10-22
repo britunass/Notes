@@ -1,91 +1,118 @@
-const { Note } = require('../models');
+const Note = require('../models/note');
 
 exports.getAllNotes = async (req, res, next) => {
   try {
-
-    const notes = await Note.findAll();
+    const notes = await Note.find().sort({ createdAt: -1 });
     res.json(notes);
-
   } catch (error) {
     next(error);
   }
 };
 
 exports.getNoteById = async (req, res, next) => {
-    try{
-
-        const note = await Note.findByPk(req.params.id);
-
-        if (!note) {
-        return res.status(404).json({ error: 'Заметка с указанным ID не найдена' });
-        }
-
-        res.json(note);
-
-    } catch {
-        next(error);
+  try {
+    const note = await Note.findById(req.params.id);
+    if (!note) {
+      return res.status(404).json({ error: 'Заметка с указанным ID не найдена' });
     }
+    res.json(note);
+  } catch (error) {
+    next(error);
+  }
 };
 
 exports.createNote = async (req, res, next) => {
-    try{
-
-    const { title, content, isArchived, tags } = req.body;
-
+  try {
+    const { title, content, isArchived, tags, checklist } = req.body;
     if (!title || !content) {
       return res.status(400).json({ error: 'Поля "title" и "content" обязательны для заполнения' });
     }
-
-    const newNote = await Note.create({ title, content, isArchived, tags });
-
+    const newNote = await Note.create({ title, content, isArchived, tags, checklist });
     res.status(201).json(newNote);
-
-  } catch {
+  } catch (error) {
     next(error);
-  } 
+  }
 };
 
 exports.updateNote = async (req, res, next) => {
-    try{
-
+  try {
     const { title, content, isArchived, tags } = req.body;
-
     if (!title || !content) {
       return res.status(400).json({ error: 'Поля "title" и "content" обязательны для обновления' });
     }
-
-    const [updatedRows] = await Note.update(
+    const updated = await Note.findByIdAndUpdate(
+      req.params.id,
       { title, content, isArchived, tags },
-      { where: { id: req.params.id } }
+      { new: true, runValidators: true }
     );
-
-    if (updatedRows === 0) {
+    if (!updated) {
       return res.status(404).json({ error: 'Заметка не найдена' });
     }
-
-    const updatedNote = await Note.findByPk(req.params.id);
-
-    res.json(updatedNote);
-
-  } catch{
+    res.json(updated);
+  } catch (error) {
     next(error);
   }
 };
 
 exports.deleteNote = async (req, res, next) => {
-    try{ 
-  
-    const deletedRows = await Note.destroy({
-        where: { id: req.params.id }
-    });
+  try {
+    const deleted = await Note.findByIdAndDelete(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ error: 'Заметка не найдена' });
+    }
+    res.json({ message: 'Заметка успешно удалена', note: deleted });
+  } catch (error) {
+    next(error);
+  }
+};
 
-    if (deletedRows === 0) {
-        return res.status(404).json({ error: 'Заметка не найдена' });
-      }
+// ---- Работа с вложенным массивом (Часть 6) ----
 
-    res.json({ message: 'Заметка успешно удалена'});
-    
-  } catch{
+// Добавить пункт в чек-лист
+exports.addChecklistItem = async (req, res, next) => {
+  try {
+    const { text } = req.body;
+    if (!text) return res.status(400).json({ error: 'Поле "text" обязательно' });
+
+    const note = await Note.findByIdAndUpdate(
+      req.params.id,
+      { $push: { checklist: { text } } },
+      { new: true, runValidators: true }
+    );
+    if (!note) return res.status(404).json({ error: 'Заметка не найдена' });
+    res.status(201).json(note);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Обновить элемент ВНУТРИ массива (позиционный оператор $)
+exports.updateChecklistItem = async (req, res, next) => {
+  try {
+    const { done } = req.body;
+    const note = await Note.findOneAndUpdate(
+      { _id: req.params.id, 'checklist._id': req.params.itemId },
+      { $set: { 'checklist.$.done': done } },
+      { new: true }
+    );
+    if (!note) return res.status(404).json({ error: 'Заметка или пункт не найдены' });
+    res.json(note);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Удалить элемент из массива
+exports.deleteChecklistItem = async (req, res, next) => {
+  try {
+    const note = await Note.findByIdAndUpdate(
+      req.params.id,
+      { $pull: { checklist: { _id: req.params.itemId } } },
+      { new: true }
+    );
+    if (!note) return res.status(404).json({ error: 'Заметка не найдена' });
+    res.json(note);
+  } catch (error) {
     next(error);
   }
 };
