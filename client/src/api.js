@@ -31,4 +31,8 @@ export const createNote = (noteData) => api.post('/notes', noteData);
 export const updateNote = (id, noteData) => api.put(`/notes/${id}`, noteData);
 export const deleteNote = (id) => api.delete(`/notes/${id}`);
 
+export const fetchShares = (id) => api.get(`/notes/${id}/share`);
+export const shareNote = (id, data) => api.post(`/notes/${id}/share`, data);
+export const unshareNote = (id, userId) => api.delete(`/notes/${id}/share/${userId}`);
+
 export default api;

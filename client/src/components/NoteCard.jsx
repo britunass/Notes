@@ -3,8 +3,10 @@ import ReactMarkdown from 'react-markdown';
 
 export function NoteCard({ note, isSelected, onSelect }) {
   const hasTags = note.tags && note.tags.length > 0;
+  const isShared = note.permission && note.permission !== 'owner';
 
   return (
+    
     <div
       onClick={() => onSelect(note.id)}
       style={{
@@ -72,6 +74,11 @@ export function NoteCard({ note, isSelected, onSelect }) {
 
       <div style={{ fontSize: '10px', color: '#666', marginTop: '6px', minHeight: '15px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {hasTags ? note.tags.map(t => `#${t}`).join(' ') : ''}
+        {isShared && (
+          <span style={{ marginLeft: hasTags ? '8px' : 0 }}>
+            👥 {note.ownerEmail}
+          </span>
+        )}
       </div>
     </div>
   );

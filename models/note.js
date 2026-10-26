@@ -10,7 +10,8 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Note.belongsTo(models.User,{foreignKey: 'userId'});
+      Note.belongsTo(models.User, { foreignKey: 'userId', as: 'owner' });
+      Note.hasMany(models.NoteShare, { foreignKey: 'noteId' });
     }
   }
   Note.init({
@@ -23,6 +24,10 @@ module.exports = (sequelize, DataTypes) => {
     tags: {
       type: DataTypes.ARRAY(DataTypes.STRING),
       defaultValue: []
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false
     }
   }, {
     sequelize,

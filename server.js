@@ -5,6 +5,9 @@ const authRoutes = require('./routes/authRoutes');
 const authMiddleware = require('./middleware/auth');
 const app = express();
 const PORT = process.env.PORT || 3000;
+const http = require('http');
+const initSocket = require('./socket');
+const server = http.createServer(app);
 
 app.use(cors());
 app.use(express.json());
@@ -22,6 +25,9 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Внутренняя ошибка сервера' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Сервер запущен...`);
-});
+app.set('io', initSocket(server));
+server.listen(PORT, () => console.log(`Сервер запущен на порту ${PORT}`));
+
+//app.listen(PORT, () => {
+ // console.log(`Сервер запущен...`);
+//});

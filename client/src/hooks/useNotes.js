@@ -129,6 +129,19 @@ export function useNotes() {
     }
   };
 
+  const upsertNote = useCallback((note) => {
+    setNotes(prev =>
+      prev.some(n => n.id === note.id)
+        ? prev.map(n => (n.id === note.id ? { ...n, ...note } : n))
+        : [note, ...prev]
+    );
+  }, []);
+
+  const removeNote = useCallback((id) => {
+    setNotes(prev => prev.filter(n => n.id !== id));
+    setSelectedNoteId(cur => (cur === id ? null : cur));
+  }, []);
+
   return {
     notes,
     loading,
@@ -141,6 +154,8 @@ export function useNotes() {
     selectNote,
     saveNote,
     deleteNote,
-    toggleArchive
+    toggleArchive,
+    upsertNote,
+    removeNote
   };
 }

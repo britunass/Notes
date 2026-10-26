@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNotes } from './useNotes';
 import { useNoteForm } from './useNoteForm';
 import { useNoteFilter } from './useNoteFilter';
+import { useNoteSocket } from './useNoteSocket';
 
 export function useNotesLogic() {
   const notesState = useNotes();
@@ -50,6 +51,25 @@ export function useNotesLogic() {
     setNotification({ text: 'Статус архивации изменен!', isError: false });
   };
 
+  const notify = (text, isError = false) => setNotification({ text, isError });
+
+  const live = useNoteSocket(
+    notesState.isCreatingNew ? null : notesState.selectedNoteId,
+    {
+      // правки других применяем прямо в поля формы, не через notes
+      onRemoteEdit: (patch) => {
+        if (patch.title !== undefined) form.setTitle(patch.title);
+        if (patch.content !== undefined) form.setContent(patch.content);
+        if (patch.tags !== undefined) form.setTags(patch.tags);
+      },
+      onConnection: notify,
+      onSaved: ({ note, by }) => { notesState.upsertNote(note); notify(`${by} сохранил заметку`); },
+      onDeleted: ({ noteId, by }) => { notesState.removeNote(noteId); notify(`${by} удалил заметку`, true); },
+      onShared: ({ note, by }) => { notesState.upsertNote(note); notify(`${by} поделился с вами заметкой «${note.title}»`); },
+      onUnshared: ({ noteId }) => { notesState.removeNote(noteId); notify('Доступ к заметке закрыт', true); }
+    }
+  );
+
   return {
     notes: notesState.notes,
     selectedNote: notesState.selectedNote,
@@ -63,6 +83,8 @@ export function useNotesLogic() {
     handleToggleArchive,
     form,
     filter,
-    notification
+    notification,
+    live,
+    notify
   };
 }

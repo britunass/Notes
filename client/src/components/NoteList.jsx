@@ -6,6 +6,8 @@ import { NoteSearch } from './NoteSearch';
 import { NoteCard } from './NoteCard';
 import { NoteEditor } from './NoteEditor';
 import { NoteActions } from './NoteActions';
+import { NotePresence } from './NotePresence';
+import { ShareDialog } from './ShareDialog';
 
 export function NoteList() {
   const {
@@ -21,8 +23,18 @@ export function NoteList() {
     handleToggleArchive,
     form,
     filter,
-    notification
+    notification,
+    live,
+    notify
   } = useNotesLogic();
+
+  const permission = selectedNote?.permission || 'owner';
+  const readOnly = permission === 'read';
+  const isOwner = permission === 'owner';
+
+  const onTitle = (v) => { form.setTitle(v); live.sendEdit({ title: v }); live.sendTyping(); };
+  const onContent = (v) => { form.setContent(v); live.sendEdit({ content: v }); live.sendTyping(); };
+  const onTags = (v) => { form.setTags(v); live.sendEdit({ tags: v }); live.sendTyping(); };
 
   if (isLoading) {
     return (
@@ -99,19 +111,27 @@ export function NoteList() {
 
           {(selectedNote || isCreatingNew) ? (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '20px', alignItems: 'start' }}>
-              <NoteEditor
-                title={form.title}
-                setTitle={form.setTitle}
-                content={form.content}
-                setContent={form.setContent}
-                tags={form.tags}
-                setTags={form.setTags}
-                isArchived={isArchived}
-              />
+              <div> 
+                <NotePresence online={live.online} typingUsers={live.typingUsers} />
+                <NoteEditor
+                  title={form.title}
+                  setTitle={form.setTitle}
+                  content={form.content}
+                  setContent={form.setContent}
+                  tags={form.tags}
+                  setTags={form.setTags}
+                  isArchived={isArchived || readOnly}
+                />
+                {isOwner && !isCreatingNew && selectedNote && (
+                    <ShareDialog noteId={selectedNote.id} onMessage={notify} />
+                  )}
+              </div>
 
               <NoteActions
                 isArchived={isArchived}
                 isCreatingNew={isCreatingNew}
+                readOnly={readOnly}
+                isOwner={isOwner}
                 onSave={handleSave}
                 onToggleArchive={handleToggleArchive}
                 onDelete={handleDelete}
