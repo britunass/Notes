@@ -3,6 +3,7 @@ import { useNotes } from './useNotes';
 import { useNoteForm } from './useNoteForm';
 import { useNoteFilter } from './useNoteFilter';
 import { useNoteSocket } from './useNoteSocket';
+import { leaveNote } from '../api';
 
 export function useNotesLogic() {
   const notesState = useNotes();
@@ -10,6 +11,7 @@ export function useNotesLogic() {
   const filter = useNoteFilter(notesState.notes);
   const [isLoading, setIsLoading] = useState(true);
   const [notification, setNotification] = useState({ text: '', isError: false });
+  const [shareVersion, setShareVersion] = useState(0);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 300);
@@ -56,7 +58,6 @@ export function useNotesLogic() {
   const live = useNoteSocket(
     notesState.isCreatingNew ? null : notesState.selectedNoteId,
     {
-      // правки других применяем прямо в поля формы, не через notes
       onRemoteEdit: (patch) => {
         if (patch.title !== undefined) form.setTitle(patch.title);
         if (patch.content !== undefined) form.setContent(patch.content);
@@ -66,9 +67,22 @@ export function useNotesLogic() {
       onSaved: ({ note, by }) => { notesState.upsertNote(note); notify(`${by} сохранил заметку`); },
       onDeleted: ({ noteId, by }) => { notesState.removeNote(noteId); notify(`${by} удалил заметку`, true); },
       onShared: ({ note, by }) => { notesState.upsertNote(note); notify(`${by} поделился с вами заметкой «${note.title}»`); },
+      onShareChanged: () => setShareVersion(v => v + 1),
       onUnshared: ({ noteId }) => { notesState.removeNote(noteId); notify('Доступ к заметке закрыт', true); }
     }
   );
+
+  const handleLeave = async () => {
+    const id = notesState.selectedNoteId;
+    if (!id) return;
+    try {
+      await leaveNote(id);
+      notesState.removeNote(id);
+      notify('Вы отключились от заметки');
+    } catch (err) {
+      notify(err.response?.data?.error || 'Не удалось отключиться', true);
+    }
+  };
 
   return {
     notes: notesState.notes,
@@ -85,6 +99,9 @@ export function useNotesLogic() {
     filter,
     notification,
     live,
-    notify
+    notify,
+    handleLeave,
+    shareVersion,
+    setNoteShared: notesState.setNoteShared
   };
 }

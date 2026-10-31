@@ -1,6 +1,6 @@
 import React from 'react';
 
-export function NoteActions({ isArchived, isCreatingNew, readOnly, isOwner, onSave, onToggleArchive, onDelete }) {
+export function NoteActions({ isArchived, isCreatingNew, readOnly, isOwner, onSave, onToggleArchive, onDelete, onLeave  }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', minWidth: '120px' }}>
       {!isArchived && !readOnly &&  (
@@ -18,6 +18,23 @@ export function NoteActions({ isArchived, isCreatingNew, readOnly, isOwner, onSa
           }}
         >
           Сохранить
+        </button>
+      )}
+
+      {!isOwner && (
+        <button
+          onClick={onLeave}
+          style={{
+            background: '#17a2b8',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '4px',
+            padding: '8px 14px',
+            fontSize: '12px',
+            cursor: 'pointer'
+          }}
+        >
+          Отключиться
         </button>
       )}
 

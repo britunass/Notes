@@ -25,7 +25,10 @@ export function NoteList() {
     filter,
     notification,
     live,
-    notify
+    notify,
+    handleLeave, 
+    shareVersion, 
+    setNoteShared
   } = useNotesLogic();
 
   const permission = selectedNote?.permission || 'owner';
@@ -67,6 +70,10 @@ export function NoteList() {
             availableTags={filter.availableTags}
             showOnlyArchived={filter.showOnlyArchived}
             onToggleArchived={() => filter.setShowOnlyArchived(prev => !prev)}
+            showForeign={filter.showForeign}
+            onToggleForeign={() => filter.setShowForeign(prev => !prev)}
+            showMine={filter.showMine}
+            onToggleMine={() => filter.setShowMine(prev => !prev)}
           />
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -110,32 +117,43 @@ export function NoteList() {
           <div style={{ height: '30px', marginBottom: '15px' }} />
 
           {(selectedNote || isCreatingNew) ? (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '20px', alignItems: 'start' }}>
-              <div> 
-                <NotePresence online={live.online} typingUsers={live.typingUsers} />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 180px', gap: '20px', alignItems: 'start' }}>
+              <div>
+                {selectedNote?.isShared && (
+                  <NotePresence online={live.online} typingUsers={live.typingUsers} />
+                )}
                 <NoteEditor
                   title={form.title}
-                  setTitle={form.setTitle}
+                  setTitle={onTitle}
                   content={form.content}
-                  setContent={form.setContent}
+                  setContent={onContent}
                   tags={form.tags}
-                  setTags={form.setTags}
+                  setTags={onTags}
                   isArchived={isArchived || readOnly}
                 />
-                {isOwner && !isCreatingNew && selectedNote && (
-                    <ShareDialog noteId={selectedNote.id} onMessage={notify} />
-                  )}
               </div>
 
-              <NoteActions
-                isArchived={isArchived}
-                isCreatingNew={isCreatingNew}
-                readOnly={readOnly}
-                isOwner={isOwner}
-                onSave={handleSave}
-                onToggleArchive={handleToggleArchive}
-                onDelete={handleDelete}
-              />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <NoteActions
+                  isArchived={isArchived}
+                  isCreatingNew={isCreatingNew}
+                  readOnly={readOnly}
+                  isOwner={isOwner}
+                  onSave={handleSave}
+                  onToggleArchive={handleToggleArchive}
+                  onDelete={handleDelete}
+                  onLeave={handleLeave}
+                />
+                {isOwner && !isCreatingNew && selectedNote && typeof selectedNote.id === 'number' && (
+                  <ShareDialog
+                    noteId={selectedNote.id}
+                    online={live.online}
+                    refreshKey={shareVersion}
+                    onMessage={notify}
+                    onSharesChange={setNoteShared}
+                  />
+                )}
+              </div>
             </div>
           ) : (
             <div style={{ color: '#aaa', textAlign: 'center', marginTop: '60px', fontSize: '14px' }}>

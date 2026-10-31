@@ -12,5 +12,6 @@ router.delete('/:id', noteController.deleteNote);
 router.get('/:id/share', shareController.getShares);
 router.post('/:id/share', shareController.shareNote);
 router.delete('/:id/share/:userId', shareController.unshare);
+router.delete('/:id/leave', shareController.leave);
 
 module.exports = router;

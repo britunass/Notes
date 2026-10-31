@@ -1,9 +1,14 @@
 import { useState, useMemo } from 'react';
 
+const isForeign = (n) => !!n.permission && n.permission !== 'owner';
+const isMine = (n) => !isForeign(n) && !!n.isShared;
+
 export function useNoteFilter(notes) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState('все');
   const [showOnlyArchived, setShowOnlyArchived] = useState(false);
+  const [showForeign, setShowForeign] = useState(false);
+  const [showMine, setShowMine] = useState(false);
 
   const availableTags = useMemo(() => {
     const tagsSet = new Set();
@@ -22,15 +27,22 @@ export function useNoteFilter(notes) {
       const matchesTag = activeTag === 'все' || note.tags?.includes(activeTag);
       const matchesArchive = showOnlyArchived ? note.isArchived : !note.isArchived;
 
-      return matchesSearch && matchesTag && matchesArchive;
+      const matchesShare =
+        (!showForeign && !showMine) ||
+        (showForeign && isForeign(note)) ||
+        (showMine && isMine(note));
+
+      return matchesSearch && matchesTag && matchesArchive && matchesShare;
     });
-  }, [notes, searchQuery, selectedTag, showOnlyArchived]);
+  }, [notes, searchQuery, selectedTag, showOnlyArchived, showForeign, showMine]);
 
   return {
     searchQuery, setSearchQuery,
     selectedTag: activeTag,
     setSelectedTag,
     showOnlyArchived, setShowOnlyArchived,
+    showForeign, setShowForeign,
+    showMine, setShowMine,
     availableTags,
     filteredNotes
   };

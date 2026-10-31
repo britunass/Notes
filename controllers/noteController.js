@@ -9,6 +9,17 @@ exports.getAllNotes = async (req, res, next) => {
       where: { userId: req.user.id }
       }
     );
+
+    const sharedIds = new Set();
+    if (own.length) {
+      const rows = await NoteShare.findAll({
+        attributes: ['noteId'],
+        where: { noteId: own.map(n => n.id) },
+        raw: true
+      });
+      rows.forEach(r => sharedIds.add(r.noteId));
+    }
+
     const shares = await NoteShare.findAll({
       where: { userId: req.user.id },
       include: [{ model: Note, include: [{ model: User, as: 'owner', attributes: ['email'] }] }]

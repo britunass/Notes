@@ -3,7 +3,8 @@ import ReactMarkdown from 'react-markdown';
 
 export function NoteCard({ note, isSelected, onSelect }) {
   const hasTags = note.tags && note.tags.length > 0;
-  const isShared = note.permission && note.permission !== 'owner';
+  const isForeign = note.permission && note.permission !== 'owner';
+  const isSharedByMe = !isForeign && note.isShared;
 
   return (
     
@@ -74,9 +75,14 @@ export function NoteCard({ note, isSelected, onSelect }) {
 
       <div style={{ fontSize: '10px', color: '#666', marginTop: '6px', minHeight: '15px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {hasTags ? note.tags.map(t => `#${t}`).join(' ') : ''}
-        {isShared && (
-          <span style={{ marginLeft: hasTags ? '8px' : 0 }}>
+        {isForeign && (
+          <span style={{ marginLeft: hasTags ? '8px' : 0 }} title="Заметка другого пользователя">
             👥 {note.ownerEmail}
+          </span>
+        )}
+        {isSharedByMe && (
+          <span style={{ marginLeft: hasTags ? '8px' : 0 }} title="Вы поделились этой заметкой">
+            🔗
           </span>
         )}
       </div>

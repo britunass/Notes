@@ -1,5 +1,15 @@
 import React from 'react';
 
+const toggleStyle = (active) => ({
+  border: 'none',
+  background: active ? '#555' : 'transparent',
+  cursor: 'pointer',
+  borderRadius: '3px',
+  padding: '2px 6px',
+  fontSize: '13px',
+  flexShrink: 0
+});
+
 export function NoteSearch({
   searchQuery,
   onSearchChange,
@@ -7,7 +17,11 @@ export function NoteSearch({
   onTagChange,
   availableTags,
   showOnlyArchived,
-  onToggleArchived
+  onToggleArchived,
+  showForeign,
+  onToggleForeign,
+  showMine,
+  onToggleMine
 }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '15px', height: '30px', width: '100%', boxSizing: 'border-box' }}>
@@ -33,7 +47,7 @@ export function NoteSearch({
         value={selectedTag}
         onChange={e => onTagChange(e.target.value)}
         style={{
-          maxWidth: '90px', 
+          maxWidth: '90px',
           width: 'auto',
           border: 'none',
           borderBottom: '1px solid #777',
@@ -53,16 +67,24 @@ export function NoteSearch({
       </select>
 
       <button
+        onClick={onToggleForeign}
+        style={toggleStyle(showForeign)}
+        title={showForeign ? 'Показать все заметки' : 'Только заметки, которыми поделились с вами'}
+      >
+        👥
+      </button>
+
+      <button
+        onClick={onToggleMine}
+        style={toggleStyle(showMine)}
+        title={showMine ? 'Показать все заметки' : 'Только мои заметки, которыми я поделился'}
+      >
+        🔗
+      </button>
+
+      <button
         onClick={onToggleArchived}
-        style={{
-          border: 'none',
-          background: showOnlyArchived ? '#555' : 'transparent',
-          cursor: 'pointer',
-          borderRadius: '3px',
-          padding: '2px 6px',
-          fontSize: '13px',
-          flexShrink: 0
-        }}
+        style={toggleStyle(showOnlyArchived)}
         title={showOnlyArchived ? 'Показать активные' : 'Показать только архивированные'}
       >
         🗁

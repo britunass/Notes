@@ -15,7 +15,8 @@ export function useNoteForm(selectedNote, isCreatingNew) {
       setContent(selectedNote.content || '');
       setTags(selectedNote.tags ? selectedNote.tags.join(', ') : '');
     }
-  }, [selectedNote, isCreatingNew]);
+
+  }, [selectedNote?.id, isCreatingNew]);
 
   const getParsedFormData = () => {
     const parsedTags = tags

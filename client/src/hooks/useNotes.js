@@ -142,6 +142,14 @@ export function useNotes() {
     setSelectedNoteId(cur => (cur === id ? null : cur));
   }, []);
 
+  const setNoteShared = useCallback((id, flag) => {
+    setNotes(prev =>
+      prev.some(n => n.id === id && !!n.isShared !== flag)
+        ? prev.map(n => (n.id === id ? { ...n, isShared: flag } : n))
+        : prev
+    );
+  }, []);
+
   return {
     notes,
     loading,
@@ -156,6 +164,7 @@ export function useNotes() {
     deleteNote,
     toggleArchive,
     upsertNote,
-    removeNote
+    removeNote,
+    setNoteShared
   };
 }

@@ -1,6 +1,5 @@
 const { Note, NoteShare, User } = require('../models');
 
-// POST /notes/:id/share  { email, permission }
 exports.shareNote = async (req, res, next) => {
   try {
     const { email, permission = 'edit' } = req.body;
@@ -21,10 +20,9 @@ exports.shareNote = async (req, res, next) => {
     if (!created && share.permission !== permission) await share.update({ permission });
 
     const io = req.app.get('io');
-    // если право изменилось, а человек уже в комнате, выводим его из неё: клиент зайдёт заново и получит новое право
     io.in(`user:${target.id}`).socketsLeave(`note:${note.id}`);
     io.to(`user:${target.id}`).emit('note:shared', {
-      note: { ...note.toJSON(), permission, ownerEmail: req.user.email },
+      note: { ...note.toJSON(), permission, ownerEmail: req.user.email, isShared: true },
       by: req.user.email
     });
 
@@ -34,7 +32,6 @@ exports.shareNote = async (req, res, next) => {
   }
 };
 
-// GET /notes/:id/share
 exports.getShares = async (req, res, next) => {
   try {
     const note = await Note.findOne({ where: { id: req.params.id, userId: req.user.id } });
@@ -49,7 +46,6 @@ exports.getShares = async (req, res, next) => {
   }
 };
 
-// DELETE /notes/:id/share/:userId
 exports.unshare = async (req, res, next) => {
   try {
     const note = await Note.findOne({ where: { id: req.params.id, userId: req.user.id } });
@@ -62,6 +58,26 @@ exports.unshare = async (req, res, next) => {
     io.in(`user:${req.params.userId}`).socketsLeave(`note:${note.id}`);
     io.to(`user:${req.params.userId}`).emit('note:unshared', { noteId: note.id });
     res.json({ message: 'Доступ закрыт' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.leave = async (req, res, next) => {
+  try {
+    const noteId = Number(req.params.id);
+    const note = await Note.findByPk(noteId);
+    if (!note) return res.status(404).json({ error: 'Заметка не найдена' });
+
+    const deleted = await NoteShare.destroy({ where: { noteId, userId: req.user.id } });
+    if (!deleted) return res.status(404).json({ error: 'Вы не подключены к этой заметке' });
+
+    const io = req.app.get('io');
+    io.in(`user:${req.user.id}`).socketsLeave(`note:${noteId}`);
+    io.to(`note:${noteId}`).emit('presence:left', { noteId, email: req.user.email });
+    io.to(`user:${note.userId}`).emit('note:share-changed', { noteId });
+
+    res.json({ message: 'Вы отключились от заметки' });
   } catch (error) {
     next(error);
   }
