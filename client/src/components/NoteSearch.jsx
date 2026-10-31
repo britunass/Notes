@@ -1,6 +1,7 @@
 import React from 'react';
 import { Dropdown } from './Dropdown';
 import { Tooltip } from './Tooltip';
+import { PeopleFilter } from './PeopleFilter';
 
 const toggleStyle = (active) => ({
   border: 'none',
@@ -23,7 +24,11 @@ export function NoteSearch({
   showForeign,
   onToggleForeign,
   showMine,
-  onToggleMine
+  onToggleMine,
+  people,
+  selectedPeople,
+  onTogglePerson,
+  onClearPeople
 }) {
   const tagOptions = availableTags.map(tag => ({ value: tag, label: `#${tag}` }));
 
@@ -54,13 +59,19 @@ export function NoteSearch({
         style={{ width: '90px', flexShrink: 0 }}
       />
 
-      <Tooltip text={showForeign ? 'Показать все заметки' : 'Только заметки, которыми поделились с вами'}>
-        <button onClick={onToggleForeign} style={toggleStyle(showForeign)}>👥</button>
-      </Tooltip>
-
-      <Tooltip text={showMine ? 'Показать все заметки' : 'Только мои заметки, которыми я поделился'}>
-        <button onClick={onToggleMine} style={toggleStyle(showMine)}>🔗</button>
-      </Tooltip>
+      <PeopleFilter
+        people={people}
+        selected={selectedPeople}
+        onToggle={onTogglePerson}
+        onClear={onClearPeople}
+      >
+        <Tooltip text={showForeign ? 'Показать все заметки' : 'Только заметки, которыми поделились с вами'}>
+          <button onClick={onToggleForeign} style={toggleStyle(showForeign)}>👥</button>
+        </Tooltip>
+        <Tooltip text={showMine ? 'Показать все заметки' : 'Только мои заметки, которыми я поделился'}>
+          <button onClick={onToggleMine} style={toggleStyle(showMine)}>🔗</button>
+        </Tooltip>
+      </PeopleFilter>
 
       <Tooltip text={showOnlyArchived ? 'Показать активные' : 'Показать только архивированные'}>
         <button onClick={onToggleArchived} style={toggleStyle(showOnlyArchived)}>🗁</button>

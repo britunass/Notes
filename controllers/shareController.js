@@ -22,7 +22,7 @@ exports.shareNote = async (req, res, next) => {
     const io = req.app.get('io');
     io.in(`user:${target.id}`).socketsLeave(`note:${note.id}`);
     io.to(`user:${target.id}`).emit('note:shared', {
-      note: { ...note.toJSON(), permission, ownerEmail: req.user.email, isShared: true },
+      note: { ...note.toJSON(), permission, ownerEmail: req.user.email, isShared: true, participants: [req.user.email]},
       by: req.user.email
     });
 

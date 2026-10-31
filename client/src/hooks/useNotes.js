@@ -142,12 +142,17 @@ export function useNotes() {
     setSelectedNoteId(cur => (cur === id ? null : cur));
   }, []);
 
-  const setNoteShared = useCallback((id, flag) => {
-    setNotes(prev =>
-      prev.some(n => n.id === id && !!n.isShared !== flag)
-        ? prev.map(n => (n.id === id ? { ...n, isShared: flag } : n))
-        : prev
-    );
+  const setNoteShared = useCallback((id, emails) => {
+    const sorted = [...emails].sort();
+    setNotes(prev => {
+      const target = prev.find(n => n.id === id);
+      if (!target) return prev;
+      const same =
+        JSON.stringify(target.participants || []) === JSON.stringify(sorted) &&
+        !!target.isShared === (sorted.length > 0);
+      if (same) return prev;
+      return prev.map(n => (n.id === id ? { ...n, participants: sorted, isShared: sorted.length > 0 } : n));
+    });
   }, []);
 
   return {

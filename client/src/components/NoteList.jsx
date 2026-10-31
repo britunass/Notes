@@ -34,6 +34,7 @@ export function NoteList() {
   const permission = selectedNote?.permission || 'owner';
   const readOnly = permission === 'read';
   const isOwner = permission === 'owner';
+  const isSharedNote = !!selectedNote && (!isOwner || !!selectedNote.isShared);
 
   const onTitle = (v) => { form.setTitle(v); live.sendEdit({ title: v }); live.sendTyping(); };
   const onContent = (v) => { form.setContent(v); live.sendEdit({ content: v }); live.sendTyping(); };
@@ -76,6 +77,10 @@ export function NoteList() {
             onToggleForeign={() => filter.setShowForeign(prev => !prev)}
             showMine={filter.showMine}
             onToggleMine={() => filter.setShowMine(prev => !prev)}
+            people={filter.people}
+            selectedPeople={filter.activePeople}
+            onTogglePerson={filter.togglePerson}
+            onClearPeople={filter.clearPeople}
           />
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -121,7 +126,7 @@ export function NoteList() {
           {(selectedNote || isCreatingNew) ? (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 180px', gap: '20px', alignItems: 'start' }}>
               <div>
-                {selectedNote?.isShared && (
+                {isSharedNote && (
                   <NotePresence online={live.online} typingUsers={live.typingUsers} />
                 )}
                 <NoteEditor

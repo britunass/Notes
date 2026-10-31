@@ -3,33 +3,46 @@ const { getNoteAccess } = require('../utils/access');
 
 exports.getAllNotes = async (req, res, next) => {
   try {
-
-    const own = await Note.findAll(
-      {
-      where: { userId: req.user.id }
-      }
-    );
-
-    const sharedIds = new Set();
-    if (own.length) {
-      const rows = await NoteShare.findAll({
-        attributes: ['noteId'],
-        where: { noteId: own.map(n => n.id) },
-        raw: true
-      });
-      rows.forEach(r => sharedIds.add(r.noteId));
-    }
+    const me = req.user.email;
+    const own = await Note.findAll({ where: { userId: req.user.id } });
 
     const shares = await NoteShare.findAll({
       where: { userId: req.user.id },
       include: [{ model: Note, include: [{ model: User, as: 'owner', attributes: ['email'] }] }]
     });
-    const shared = shares
-    .filter(s => s.Note)
-    .map(s => ({ ...s.Note.toJSON(), permission: s.permission, ownerEmail: s.Note.owner?.email }));
+    const foreignNotes = shares.filter(s => s.Note);
 
-    res.json([...own.map(n => ({ ...n.toJSON(), permission: 'owner' })), ...shared]);
+    const allIds = [...own.map(n => n.id), ...foreignNotes.map(s => s.Note.id)];
+    const byNote = {};
+    if (allIds.length) {
+      const rows = await NoteShare.findAll({
+        where: { noteId: allIds },
+        include: [{ model: User, attributes: ['email'] }]
+      });
+      rows.forEach(r => {
+        if (r.User) (byNote[r.noteId] = byNote[r.noteId] || []).push(r.User.email);
+      });
+    }
 
+    const ownOut = own.map(n => {
+      const participants = (byNote[n.id] || []).sort();
+      return { ...n.toJSON(), permission: 'owner', isShared: participants.length > 0, participants };
+    });
+
+    const foreignOut = foreignNotes.map(s => {
+      const ownerEmail = s.Note.owner?.email;
+      const others = (byNote[s.Note.id] || []).filter(e => e !== me);
+      const participants = [ownerEmail, ...others].filter(Boolean).sort();
+      return {
+        ...s.Note.toJSON(),
+        permission: s.permission,
+        ownerEmail,
+        isShared: true,
+        participants
+      };
+    });
+
+    res.json([...ownOut, ...foreignOut]);
   } catch (error) {
     next(error);
   }

@@ -69,7 +69,7 @@ export function ShareDialog({ noteId, online = [], refreshKey = 0, onMessage, on
     try {
       const { data } = await fetchShares(noteId);
       setShares(data);
-      onSharesChange?.(noteId, data.length > 0);
+      onSharesChange?.(noteId, data.map(s => s.email));
     } catch {
       setShares([]);
     }
@@ -82,7 +82,7 @@ export function ShareDialog({ noteId, online = [], refreshKey = 0, onMessage, on
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [noteId, refreshKey]);
 
   const submit = async (e) => {
