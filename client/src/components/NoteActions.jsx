@@ -42,7 +42,7 @@ export function NoteActions({ isArchived, isCreatingNew, readOnly, isOwner, onSa
         <button
           onClick={onToggleArchive}
           style={{
-            background: isArchived ? '#007bff' : '#6c757d',
+            background: isArchived ? '#9ea5ab ' : '#6c757d',
             color: '#fff',
             border: 'none',
             borderRadius: '4px',

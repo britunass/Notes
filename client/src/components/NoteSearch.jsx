@@ -1,4 +1,6 @@
 import React from 'react';
+import { Dropdown } from './Dropdown';
+import { Tooltip } from './Tooltip';
 
 const toggleStyle = (active) => ({
   border: 'none',
@@ -23,8 +25,10 @@ export function NoteSearch({
   showMine,
   onToggleMine
 }) {
+  const tagOptions = availableTags.map(tag => ({ value: tag, label: `#${tag}` }));
+
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '15px', height: '30px', width: '100%', boxSizing: 'border-box' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '15px', height: '30px', width: '350px', maxWidth: '100%', boxSizing: 'border-box' }}>
       <input
         type="text"
         placeholder="Поиск..."
@@ -43,52 +47,24 @@ export function NoteSearch({
         }}
       />
 
-      <select
+      <Dropdown
         value={selectedTag}
-        onChange={e => onTagChange(e.target.value)}
-        style={{
-          maxWidth: '90px',
-          width: 'auto',
-          border: 'none',
-          borderBottom: '1px solid #777',
-          background: 'transparent',
-          fontSize: '12px',
-          padding: '4px 20px 4px 0',
-          outline: 'none',
-          color: 'inherit',
-          cursor: 'pointer'
-        }}
-      >
-        {availableTags.map(tag => (
-          <option key={tag} value={tag} style={{ backgroundColor: '#555', color: '#d0d0d0' }}>
-            #{tag}
-          </option>
-        ))}
-      </select>
+        options={tagOptions}
+        onChange={onTagChange}
+        style={{ width: '90px', flexShrink: 0 }}
+      />
 
-      <button
-        onClick={onToggleForeign}
-        style={toggleStyle(showForeign)}
-        title={showForeign ? 'Показать все заметки' : 'Только заметки, которыми поделились с вами'}
-      >
-        👥
-      </button>
+      <Tooltip text={showForeign ? 'Показать все заметки' : 'Только заметки, которыми поделились с вами'}>
+        <button onClick={onToggleForeign} style={toggleStyle(showForeign)}>👥</button>
+      </Tooltip>
 
-      <button
-        onClick={onToggleMine}
-        style={toggleStyle(showMine)}
-        title={showMine ? 'Показать все заметки' : 'Только мои заметки, которыми я поделился'}
-      >
-        🔗
-      </button>
+      <Tooltip text={showMine ? 'Показать все заметки' : 'Только мои заметки, которыми я поделился'}>
+        <button onClick={onToggleMine} style={toggleStyle(showMine)}>🔗</button>
+      </Tooltip>
 
-      <button
-        onClick={onToggleArchived}
-        style={toggleStyle(showOnlyArchived)}
-        title={showOnlyArchived ? 'Показать активные' : 'Показать только архивированные'}
-      >
-        🗁
-      </button>
+      <Tooltip text={showOnlyArchived ? 'Показать активные' : 'Показать только архивированные'}>
+        <button onClick={onToggleArchived} style={toggleStyle(showOnlyArchived)}>🗁</button>
+      </Tooltip>
     </div>
   );
 }

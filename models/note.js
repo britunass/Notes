@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Note.init({
     title: DataTypes.STRING,
-    content: DataTypes.STRING,
+    content: DataTypes.TEXT,
     isArchived: { 
       type: DataTypes.BOOLEAN,
       defaultValue: false

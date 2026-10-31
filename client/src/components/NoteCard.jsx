@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
+import { Tooltip } from './Tooltip';
 
 export function NoteCard({ note, isSelected, onSelect }) {
   const hasTags = note.tags && note.tags.length > 0;
@@ -76,14 +77,14 @@ export function NoteCard({ note, isSelected, onSelect }) {
       <div style={{ fontSize: '10px', color: '#666', marginTop: '6px', minHeight: '15px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
         {hasTags ? note.tags.map(t => `#${t}`).join(' ') : ''}
         {isForeign && (
-          <span style={{ marginLeft: hasTags ? '8px' : 0 }} title="Заметка другого пользователя">
-            👥 {note.ownerEmail}
-          </span>
+          <Tooltip text="Заметка другого пользователя">
+            <span style={{ marginLeft: hasTags ? '8px' : 0 }}>👥 {note.ownerEmail}</span>
+          </Tooltip>
         )}
         {isSharedByMe && (
-          <span style={{ marginLeft: hasTags ? '8px' : 0 }} title="Вы поделились этой заметкой">
-            🔗
-          </span>
+          <Tooltip text="Вы поделились этой заметкой">
+            <span style={{ marginLeft: hasTags ? '8px' : 0 }}>🔗</span>
+          </Tooltip>
         )}
       </div>
     </div>

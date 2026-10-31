@@ -12,7 +12,11 @@ export function useNoteFilter(notes) {
 
   const availableTags = useMemo(() => {
     const tagsSet = new Set();
-    notes.forEach(note => note.tags?.forEach(tag => tagsSet.add(tag)));
+    notes.forEach(note => 
+      note.tags?.forEach(tag => {
+        if (tag !== 'все') tagsSet.add(tag);
+      })
+    );
     return ['все', ...Array.from(tagsSet)];
   }, [notes]);
 

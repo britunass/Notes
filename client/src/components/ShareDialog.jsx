@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { shareNote, fetchShares, unshareNote } from '../api';
+import { Dropdown } from './Dropdown';
+import { Tooltip } from './Tooltip';
 
 const btn = {
   width: '100%',
@@ -24,6 +26,37 @@ const field = {
   fontSize: '12px',
   outline: 'none'
 };
+
+const roles = [
+  { value: 'edit', label: 'редактирование' },
+  { value: 'read', label: 'только чтение' }
+];
+
+function RemoveButton({ onClick }) {
+  const [hover, setHover] = useState(false);
+  return (
+    <Tooltip text="Закрыть доступ">
+      <button
+        type="button"
+        onClick={onClick}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        style={{
+          border: 'none',
+          background: 'transparent',
+          cursor: 'pointer',
+          fontSize: '15px',
+          lineHeight: 1,
+          padding: '0 2px',
+          color: hover ? '#ff4d4d' : 'inherit',
+          transition: 'color 0.15s'
+        }}
+      >
+        ×
+      </button>
+    </Tooltip>
+  );
+}
 
 export function ShareDialog({ noteId, online = [], refreshKey = 0, onMessage, onSharesChange }) {
   const [open, setOpen] = useState(false);
@@ -77,7 +110,6 @@ export function ShareDialog({ noteId, online = [], refreshKey = 0, onMessage, on
     }
   };
 
-  // свёрнуто: одна кнопка «Поделиться ▾»
   if (!open) {
     return (
       <button type="button" style={btn} onClick={() => setOpen(true)}>
@@ -86,12 +118,11 @@ export function ShareDialog({ noteId, online = [], refreshKey = 0, onMessage, on
     );
   }
 
-  // развёрнуто: стрелка вверх на месте кнопки, поля, список, внизу сама кнопка «Поделиться»
   return (
     <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-      <button type="button" style={btn} onClick={() => setOpen(false)} title="Свернуть">
-        ▴
-      </button>
+      <Tooltip text="Свернуть">
+        <button type="button" style={btn} onClick={() => setOpen(false)}>▴</button>
+      </Tooltip>
 
       <input
         type="email"
@@ -102,10 +133,7 @@ export function ShareDialog({ noteId, online = [], refreshKey = 0, onMessage, on
         style={field}
       />
 
-      <select value={permission} onChange={e => setPermission(e.target.value)} style={field}>
-        <option value="edit" style={{ backgroundColor: '#555', color: '#d0d0d0' }}>редактирование</option>
-        <option value="read" style={{ backgroundColor: '#555', color: '#d0d0d0' }}>только чтение</option>
-      </select>
+      <Dropdown value={permission} options={roles} onChange={setPermission} variant="box" />
 
       <div style={{ fontSize: '11px' }}>
         <div style={{ color: '#888', marginBottom: '4px' }}>Доступ выдан:</div>
@@ -116,9 +144,7 @@ export function ShareDialog({ noteId, online = [], refreshKey = 0, onMessage, on
             <span style={{ flex: 1, wordBreak: 'break-all' }}>
               {s.email} ({s.permission === 'edit' ? 'ред.' : 'чтение'})
             </span>
-            <button type="button" onClick={() => remove(s.userId)}
-                    style={{ border: 'none', background: 'transparent', color: 'inherit', cursor: 'pointer' }}
-                    title="Закрыть доступ">×</button>
+            <RemoveButton onClick={() => remove(s.userId)} />
           </div>
         ))}
       </div>

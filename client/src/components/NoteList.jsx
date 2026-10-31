@@ -60,6 +60,8 @@ export function NoteList() {
             total={notes.length}
             active={notes.filter(n => !n.isArchived).length}
             archived={notes.filter(n => n.isArchived).length}
+            foreign={notes.filter(n => n.permission && n.permission !== 'owner').length}
+            mine={notes.filter(n => (!n.permission || n.permission === 'owner') && n.isShared).length}
           />
 
           <NoteSearch

@@ -46,7 +46,7 @@ exports.getNoteById = async (req, res, next) => {
 
       res.json({ ...note.toJSON(), permission: access });
 
-    } catch {
+    } catch (error) {
         next(error);
     }
 };
@@ -64,7 +64,7 @@ exports.createNote = async (req, res, next) => {
 
     res.status(201).json({ ...newNote.toJSON(), permission: 'owner' });
 
-  } catch {
+  } catch (error) {
     next(error);
   } 
 };
@@ -95,7 +95,7 @@ exports.updateNote = async (req, res, next) => {
 
     res.json({ ...note.toJSON(), permission: access });
 
-  } catch{
+  } catch (error) {
     next(error);
   }
 };
@@ -114,7 +114,7 @@ exports.deleteNote = async (req, res, next) => {
 
     res.json({ message: 'Заметка успешно удалена'});
     
-  } catch{
+  } catch (error) {
     next(error);
   }
 };

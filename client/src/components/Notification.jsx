@@ -3,6 +3,9 @@ import React from 'react';
 export function Notification({ text, isError }) {
   if (!text) return null;
 
+  const base = isError ? '60, 10, 14' : '10, 48, 28';      
+  const edge = isError ? '255, 90, 90' : '80, 220, 140';
+
   return (
     <div
       style={{
@@ -10,11 +13,13 @@ export function Notification({ text, isError }) {
         bottom: '20px',
         right: '20px',
         padding: '12px 18px',
-        backgroundColor: isError ? '#f8d7da' : '#d4edda',
-        color: isError ? '#721c24' : '#155724',
-        border: `1px solid ${isError ? '#f5c6cb' : '#c3e6cb'}`,
-        borderRadius: '6px',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+        backgroundColor: `rgba(${base}, 0.82)`,
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        color: isError ? '#ffb9b9' : '#bdf5d2',
+        border: `1px solid rgba(${edge}, 0.25)`,
+        borderRadius: '10px',
+        boxShadow: `0 0 18px 6px rgba(${base}, 0.65)`,        
         fontSize: '13px',
         fontWeight: 'bold',
         zIndex: 1000
