@@ -75,8 +75,8 @@ exports.leave = async (req, res, next) => {
     const io = req.app.get('io');
     io.in(`user:${req.user.id}`).socketsLeave(`note:${noteId}`);
     io.to(`note:${noteId}`).emit('presence:left', { noteId, email: req.user.email });
-    io.to(`user:${note.userId}`).emit('note:share-changed', { noteId });
-
+    io.to(`user:${note.userId}`).emit('note:share-changed', { noteId, email: req.user.email, removed: true });
+    
     res.json({ message: 'Вы отключились от заметки' });
   } catch (error) {
     next(error);

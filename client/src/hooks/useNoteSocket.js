@@ -6,24 +6,24 @@ export function useNoteSocket(noteId, handlers) {
   const [typingUsers, setTypingUsers] = useState([]);
 
   const h = useRef(handlers);
-  h.current = handlers;                       // всегда актуальные колбэки
+  h.current = handlers;                       
   const noteIdRef = useRef(noteId);
   noteIdRef.current = noteId;
   const joinRef = useRef(null);
   const typingTimer = useRef(null);
   const isTypingRef = useRef(false);
 
-  // Соединение и события, не привязанные к конкретной заметке
   useEffect(() => {
     socket.connect();
 
     const onShared = (p) => {
       h.current.onShared?.(p);
-      if (p.note.id === noteIdRef.current) joinRef.current?.();   // право изменилось: зайти заново
+      if (p.note.id === noteIdRef.current) joinRef.current?.();  
     };
     const onUnshared = (p) => h.current.onUnshared?.(p);
     const onSaved = (p) => h.current.onSaved?.(p);
     const onDeleted = (p) => h.current.onDeleted?.(p);
+    const onShareChanged = (p) => h.current.onShareChanged?.(p);
     const onDisconnect = (reason) => {
       if (reason !== 'io client disconnect') h.current.onConnection?.('Соединение потеряно...', true);
     };
@@ -39,6 +39,7 @@ export function useNoteSocket(noteId, handlers) {
     socket.on('note:unshared', onUnshared);
     socket.on('note:saved', onSaved);
     socket.on('note:deleted', onDeleted);
+    socket.on('note:share-changed', onShareChanged);
     socket.on('disconnect', onDisconnect);
     socket.on('connect_error', onConnectError);
     socket.io.on('reconnect', onReconnect);
@@ -48,6 +49,7 @@ export function useNoteSocket(noteId, handlers) {
       socket.off('note:unshared', onUnshared);
       socket.off('note:saved', onSaved);
       socket.off('note:deleted', onDeleted);
+      socket.off('note:share-changed', onShareChanged);
       socket.off('disconnect', onDisconnect);
       socket.off('connect_error', onConnectError);
       socket.io.off('reconnect', onReconnect);
@@ -69,7 +71,7 @@ export function useNoteSocket(noteId, handlers) {
     };
     joinRef.current = join;
     if (socket.connected) join();
-    socket.on('connect', join);               // после переподключения заходим в комнату заново
+    socket.on('connect', join);             
 
     const onEdited = ({ noteId: id, patch, by }) => {
       if (id === noteId) h.current.onRemoteEdit?.(patch, by);
@@ -113,7 +115,6 @@ export function useNoteSocket(noteId, handlers) {
     if (noteIdRef.current && socket.connected) socket.emit('note:edit', { noteId: noteIdRef.current, patch });
   }, []);
 
-  // typing: true при первом нажатии, false через 1.5 с тишины
   const sendTyping = useCallback(() => {
     const id = noteIdRef.current;
     if (!id || !socket.connected) return;

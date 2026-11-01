@@ -67,7 +67,13 @@ export function useNotesLogic() {
       onSaved: ({ note, by }) => { notesState.upsertNote(note); notify(`${by} сохранил заметку`); },
       onDeleted: ({ noteId, by }) => { notesState.removeNote(noteId); notify(`${by} удалил заметку`, true); },
       onShared: ({ note, by }) => { notesState.upsertNote(note); notify(`${by} поделился с вами заметкой «${note.title}»`); },
-      onShareChanged: () => setShareVersion(v => v + 1),
+      onShareChanged: ({ noteId, email, removed }) => {
+        if (removed && email) {
+          const n = notesState.notes.find(x => x.id === noteId);
+          if (n) notesState.setNoteShared(noteId, (n.participants || []).filter(p => p !== email));
+        }
+        setShareVersion(v => v + 1);
+      },
       onUnshared: ({ noteId }) => { notesState.removeNote(noteId); notify('Доступ к заметке закрыт', true); }
     }
   );
