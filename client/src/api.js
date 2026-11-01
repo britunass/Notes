@@ -1,8 +1,6 @@
 import axios from 'axios';
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
-});
+const api = axios.create({ baseURL: '/api' });
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
@@ -36,4 +34,4 @@ export const shareNote = (id, data) => api.post(`/notes/${id}/share`, data);
 export const unshareNote = (id, userId) => api.delete(`/notes/${id}/share/${userId}`);
 export const leaveNote = (id) => api.delete(`/notes/${id}/leave`);
 
-export default api;
+export default api; 

@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 
-export const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:3000', {
-  autoConnect: false,                                   // подключаемся вручную после входа
+export const socket = io({
+  autoConnect: false,                                  
   auth: (cb) => cb({ token: localStorage.getItem('token') })
 });

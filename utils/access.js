@@ -1,6 +1,5 @@
 const { Note, NoteShare } = require('../models');
 
-// access: 'owner' | 'edit' | 'read' | null
 async function getNoteAccess(noteId, userId) {
   const note = await Note.findByPk(noteId);
   if (!note) return { note: null, access: null };
