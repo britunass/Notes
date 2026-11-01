@@ -8,13 +8,21 @@ const roomOf = (noteId) => `note:${noteId}`;
 module.exports = function initSocket(server) {
   const io = new Server(server, {
     cors: { origin: process.env.CLIENT_URL || 'http://localhost:5173' },
+<<<<<<< HEAD
     maxHttpBufferSize: 1e6
+=======
+    maxHttpBufferSize: 1e6       
+>>>>>>> 5bce0a3 (лаб7:баг рассинхрона сохранения в комнате)
   });
 
   io.use((socket, next) => {
     try {
       socket.data.user = jwt.verify(socket.handshake.auth.token, SECRET);
+<<<<<<< HEAD
       socket.data.access = {};
+=======
+      socket.data.access = {}; 
+>>>>>>> 5bce0a3 (лаб7:баг рассинхрона сохранения в комнате)
       next();
     } catch (err) {
       next(new Error(err.name === 'TokenExpiredError' ? 'token_expired' : 'unauthorized'));
@@ -31,7 +39,7 @@ module.exports = function initSocket(server) {
         const id = Number(noteId);
         if (!Number.isInteger(id)) return ack?.({ ok: false, error: 'Некорректный ID' });
 
-        const { access } = await getNoteAccess(id, userId);
+        const { note, access } = await getNoteAccess(id, userId);
         if (!access) return ack?.({ ok: false, error: 'Нет доступа к заметке' });
 
         socket.join(roomOf(id));
@@ -40,7 +48,8 @@ module.exports = function initSocket(server) {
 
         const sockets = await io.in(roomOf(id)).fetchSockets();
         const users = [...new Set(sockets.map(s => s.data.user.email))];
-        ack?.({ ok: true, access, users });
+        
+        ack?.({ ok: true, access, users, note: note.toJSON() });
       } catch (err) {
         console.error(err);
         ack?.({ ok: false, error: 'Ошибка сервера' });
@@ -57,9 +66,15 @@ module.exports = function initSocket(server) {
     socket.on('note:edit', ({ noteId, patch } = {}) => {
       const id = Number(noteId);
       if (!socket.rooms.has(roomOf(id))) return;
+<<<<<<< HEAD
       if (!['owner', 'edit'].includes(socket.data.access[id])) return;
       const { title, content, tags } = patch || {};
       if (typeof content === 'string' && content.length > 20000) return;
+=======
+      if (!['owner', 'edit'].includes(socket.data.access[id])) return;   
+      const { title, content, tags } = patch || {};
+      if (typeof content === 'string' && content.length > 20000) return; 
+>>>>>>> 5bce0a3 (лаб7:баг рассинхрона сохранения в комнате)
       socket.to(roomOf(id)).emit('note:edited', { noteId: id, patch: { title, content, tags }, by: email });
     });
 

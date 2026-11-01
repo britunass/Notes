@@ -55,6 +55,12 @@ export function useNotesLogic() {
 
   const notify = (text, isError = false) => setNotification({ text, isError });
 
+  const applyNoteToForm = (n) => {
+    form.setTitle(n.title);
+    form.setContent(n.content);
+    form.setTags((n.tags || []).join(', '));
+  };
+
   const live = useNoteSocket(
     notesState.isCreatingNew ? null : notesState.selectedNoteId,
     {
@@ -64,7 +70,16 @@ export function useNotesLogic() {
         if (patch.tags !== undefined) form.setTags(patch.tags);
       },
       onConnection: notify,
-      onSaved: ({ note, by }) => { notesState.upsertNote(note); notify(`${by} сохранил заметку`); },
+      onJoined: (note) => {
+        if (note.id !== notesState.selectedNoteId) return;
+        notesState.upsertNote({ ...notesState.selectedNote, ...note });
+        applyNoteToForm(note);
+      },
+      onSaved: ({ note, by }) => {
+        notesState.upsertNote(note);
+        if (note.id === notesState.selectedNoteId) applyNoteToForm(note);
+        notify(`${by} сохранил заметку`);
+      },
       onDeleted: ({ noteId, by }) => { notesState.removeNote(noteId); notify(`${by} удалил заметку`, true); },
       onShared: ({ note, by }) => { notesState.upsertNote(note); notify(`${by} поделился с вами заметкой «${note.title}»`); },
       onShareChanged: ({ noteId, email, removed }) => {

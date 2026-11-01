@@ -57,15 +57,19 @@ export function useNoteSocket(noteId, handlers) {
     };
   }, []);
 
-  // Комната текущей заметки
   useEffect(() => {
     setOnline([]);
     setTypingUsers([]);
     if (!noteId || String(noteId).startsWith('temp-')) return;
 
+    let first = true;
     const join = () => {
       socket.emit('note:join', { noteId }, (res) => {
-        if (res?.ok) setOnline(res.users);
+        if (res?.ok) {
+          setOnline(res.users); 
+          if (first && res.note) h.current.onJoined?.(res.note);
+          first = false;
+        }
         else h.current.onConnection?.(res?.error || 'Не удалось подключиться к заметке', true);
       });
     };
