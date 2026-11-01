@@ -66,9 +66,7 @@ exports.deleteNote = async (req, res, next) => {
   }
 };
 
-// ---- Работа с вложенным массивом (Часть 6) ----
 
-// Добавить пункт в чек-лист
 exports.addChecklistItem = async (req, res, next) => {
   try {
     const { text } = req.body;
@@ -86,7 +84,6 @@ exports.addChecklistItem = async (req, res, next) => {
   }
 };
 
-// Обновить элемент ВНУТРИ массива (позиционный оператор $)
 exports.updateChecklistItem = async (req, res, next) => {
   try {
     const { done } = req.body;
@@ -102,7 +99,6 @@ exports.updateChecklistItem = async (req, res, next) => {
   }
 };
 
-// Удалить элемент из массива
 exports.deleteChecklistItem = async (req, res, next) => {
   try {
     const note = await Note.findByIdAndUpdate(

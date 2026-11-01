@@ -6,7 +6,7 @@ POST {{baseUrl}}/notes
 Content-Type: application/json
 
 {
-  "title": "Планы на релиз",
+  "title": "Планы на релизж",
   "content": "## Задачи\n1. Собрать сборку УК **3.0.12.240**\n2. Сделать *тесты установки*",
   "tags": ["работа", "срочно", "сборка"],
   "checklist": [
@@ -15,6 +15,7 @@ Content-Type: application/json
   ]
 }
 
+###
 @noteId = {{createNote.response.body._id}}
 
 ### 2. Получение всех
